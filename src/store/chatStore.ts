@@ -22,35 +22,68 @@ const generateUserId = (): string => {
 
 interface ChatState {
   user: User | null;
+  isAuthenticated: boolean;
   messages: Message[];
   connectionState: ConnectionState;
-  nearbyCount: number;
+  nearbyUsers: User[];
   
-  setUser: () => void;
+  setUser: (username: string) => void;
+  login: () => void;
+  register: () => void;
+  logout: () => void;
   addMessage: (text: string) => void;
   setConnectionState: (state: ConnectionState) => void;
-  setNearbyCount: (count: number) => void;
   clearMessages: () => void;
 }
 
+const MOCK_LOCATIONS = [
+  { latitude: 37.78825, longitude: -122.4324 },
+  { latitude: 37.78925, longitude: -122.4334 },
+  { latitude: 37.78725, longitude: -122.4314 },
+  { latitude: 37.79025, longitude: -122.4344 },
+  { latitude: 37.78625, longitude: -122.4304 },
+  { latitude: 37.78525, longitude: -122.4294 },
+];
+
 export const useChatStore = create<ChatState>((set, get) => ({
   user: null,
+  isAuthenticated: false,
   messages: [],
   connectionState: 'idle',
-  nearbyCount: 0,
+  nearbyUsers: [],
 
-  setUser: () => {
-    const existingUser = get().user;
-    if (existingUser) return;
-    
+  setUser: (username: string) => {
     const userId = generateUserId();
-    const username = generateUsername();
     const color = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)];
     
+    const nearby = ['ghost_21', 'void_88', 'pixel_42', 'shadow_99', 'echo_17', 'drift_33'].map((name, i) => ({
+      id: `mock_${i}`,
+      username: name,
+      color: USER_COLORS[i % USER_COLORS.length],
+      isOnline: true,
+      location: MOCK_LOCATIONS[i],
+    }));
+
     set({
       user: { id: userId, username, color },
-      connectionState: 'connecting',
+      isAuthenticated: true,
+      nearbyUsers: nearby,
+      connectionState: 'connected',
     });
+  },
+
+  login: () => {
+    // Mock login logic
+    get().setUser(generateUsername());
+  },
+
+  register: () => {
+    // Mock register logic
+    get().setUser(generateUsername());
+  },
+
+  logout: () => {
+    set({ user: null, isAuthenticated: false, connectionState: 'idle' });
   },
 
   addMessage: (text: string) => {
@@ -72,10 +105,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setConnectionState: (connectionState: ConnectionState) => {
     set({ connectionState });
-  },
-
-  setNearbyCount: (nearbyCount: number) => {
-    set({ nearbyCount });
   },
 
   clearMessages: () => {

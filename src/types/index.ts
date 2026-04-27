@@ -20,17 +20,23 @@ export interface User {
   username: string;
   color: string;
   isOnline?: boolean;
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export type ConnectionState = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
 export type RootStackParamList = {
-  Entry: undefined;
-  Connecting: undefined;
+  Login: undefined;
+  Register: undefined;
   NearbyUsers: undefined;
+  Map: undefined;
   PrivateChat: {
     userId: string;
     username: string;
     color?: string;
   };
+  Profile: undefined;
 };
